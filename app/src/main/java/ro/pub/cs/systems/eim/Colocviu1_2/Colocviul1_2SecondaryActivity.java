@@ -25,10 +25,9 @@ public class Colocviul1_2SecondaryActivity extends AppCompatActivity {
                 int sum = extras.getInt(Constants.SUM);
 
                 intent.putExtra(Constants.SUM, sum);
-            } else {
-                intent.putExtra(Constants.SUM, 0);
+                setResult(RESULT_CANCELED,intent);
             }
-            setResult(RESULT_CANCELED,intent);
+
             finish();
         });
     }

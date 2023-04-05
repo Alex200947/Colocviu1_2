@@ -20,6 +20,8 @@ public class Colocviu1_2MainActivity extends AppCompatActivity {
     private Button compute = null;
 
     private int numberTerms = 0;
+    int sum  = 0;
+    private boolean modified = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +41,7 @@ public class Colocviu1_2MainActivity extends AppCompatActivity {
                     } else {
                         textView1.setText(textView1.getText().toString() + " + " + text);
                     }
+                    modified = true;
                     numberTerms++;
                 }
             }
@@ -48,18 +51,25 @@ public class Colocviu1_2MainActivity extends AppCompatActivity {
         compute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String text = textView1.getText().toString();
-                int sum  = 0;
-                if (text != null && !text.isEmpty()) {
-                    String[] terms = text.split(" \\+ ");
+                if (modified) {
+                    String text = textView1.getText().toString();
+                    sum = 0;
+                    if (!text.isEmpty()) {
+                        String[] terms = text.split(" \\+ ");
 
-                    for (String term : terms) {
-                        sum += Integer.parseInt(term);
+                        for (String term : terms) {
+                            sum += Integer.parseInt(term);
+                        }
+                    }
+                    Intent intent = new Intent(getApplicationContext(), Colocviul1_2SecondaryActivity.class);
+                    intent.putExtra(Constants.SUM, sum);
+
+                    startActivityForResult(intent, Constants.REQUEST_CODE);
+                } else {
+                    if (savedInstanceState != null) {
+                        Toast.makeText(getApplicationContext(), "Suma termenilor este " + sum, Toast.LENGTH_SHORT).show();
                     }
                 }
-                Intent intent = new Intent(getApplicationContext(), Colocviul1_2SecondaryActivity.class);
-                intent.putExtra(Constants.SUM, sum);
-                startActivityForResult(intent, Constants.REQUEST_CODE);
             }
         });
 
@@ -72,20 +82,19 @@ public class Colocviu1_2MainActivity extends AppCompatActivity {
         if (requestCode == Constants.REQUEST_CODE) {
             int sum = data.getIntExtra(Constants.SUM, 0);
             Toast.makeText(this, "Suma termenilor este "  + sum, Toast.LENGTH_SHORT).show();
+            modified = false;
         }
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
-        outState.putString(Constants.TEXT, textView1.getText().toString());
+        outState.putInt(Constants.SUM, sum);
     }
 
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        if (savedInstanceState.containsKey(Constants.TEXT)) {
-            textView1.setText(savedInstanceState.getString(Constants.TEXT));
-        }
+        sum = savedInstanceState.getInt(Constants.SUM);
     }
 }
